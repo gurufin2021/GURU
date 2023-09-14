@@ -63,3 +63,6 @@ The availability of fiat currency transactions enables users to purchase tokens 
 
 Users can confidently transact knowing that their payment information is handled by a trusted and regulated PSP, adhering to industry standards and security protocols. Furthermore, the integration with the blockchain ensures that every purchase, along with its details, is recorded for a verifiable and auditable history of transactions.
 <p align="center"><img src="https://doc.gurufin.io/assets/05_PSP_Integration_Payment_System_Structure.png" height="300px" width="620px"></p>
+
+## 6. GURU Explorer
+[Go to the Guru Explorer](https://scan.gurufin.io/)
