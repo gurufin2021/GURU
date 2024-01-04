@@ -1,140 +1,152 @@
 # Contributing
 
 - [Contributing](#contributing)
-  - [Pull Requests](#pull-requests)
-    - [Process for reviewing PRs](#process-for-reviewing-prs)
+  - [Overview](#overview)
+    - [Responsibilities of the stewarding team](#responsibilities-of-the-stewarding-team)
+    - [Ease of reviewing](#ease-of-reviewing)
+    - [Workflow](#workflow)
+  - [Project Board](#project-board)
+  - [Architecture Decision Records (ADR)](#architecture-decision-records-adr)
+  - [Development Procedure](#development-procedure)
+    - [Testing](#testing)
+    - [Pull Requests](#pull-requests)
+    - [Pull Request Templates](#pull-request-templates)
+    - [Requesting Reviews](#requesting-reviews)
     - [Updating Documentation](#updating-documentation)
-  - [Forking](#forking)
+    - [Changelog](#changelog)
   - [Dependencies](#dependencies)
-  - [Testing](#testing)
+  - [Protobuf](#protobuf)
   - [Branching Model and Release](#branching-model-and-release)
     - [PR Targeting](#pr-targeting)
-    - [Development Procedure](#development-procedure)
-    - [Pull Merge Procedure](#pull-merge-procedure)
-    - [Release Procedure](#release-procedure)
-    - [Point Release Procedure](#point-release-procedure)
 
-Thank you for considering making contributions to Gaia and related
-repositories!
+Thank you for considering making contributions to Gaia! 🎉👍
 
-Contributing to this repo can mean many things such as participated in
-discussion or proposing code changes. To ensure a smooth workflow for all
-contributors, the general procedure for contributing has been established:
+## Overview
 
-1. Either [open](https://github.com/cosmos/gaia/issues/new/choose) or
-   [find](https://github.com/cosmos/gaia/issues) an issue you'd like to help with
-2. Participate in thoughtful discussion on that issue
-3. If you would like to contribute:
-   1. If a the issue is a proposal, ensure that the proposal has been accepted
-   2. Ensure that nobody else has already begun working on this issue, if they have
-      make sure to contact them to collaborate
-   3. If nobody has been assigned the issue and you would like to work on it
+Contributing to this repo can mean many things such as participating in
+discussion or proposing code changes.
+Following the processes outlined in this document will lead to the best
+chance of getting changes merged into the codebase.
+
+### Responsibilities of the stewarding team
+
+Gaia has many stakeholders contributing and shaping the project. 
+The _Gaia stewarding team_ is composed of Informal Systems developers and 
+is responsible for stewarding this project over time.
+This means that the stewarding team needs to understand the nature of, 
+and agree to maintain, all of the changes that land on `main` or a backport branch. 
+It may cost a few days/weeks' worth of time to _submit_ a particular change, 
+but _maintaining_ that change over the years has a much higher cost that the stewarding team will bear.
+
+### Ease of reviewing
+
+ The fact that the stewarding team needs to be able to deeply understand the short-,
+ medium- and long-term consequences of incoming changes means that changes need
+ to be **easy to review**.
+
+ What makes a change easy to review, and more likely to land in an upcoming
+ release?
+
+ 1. **Each pull request must do _one thing_**. It must be very clear what that
+    one thing is when looking at the pull request title, description, and linked
+    issues. It must also be very clear what value it ultimately aims to deliver,
+    and for which user(s). A single pull request that does multiple things, or
+    without a clear articulation of the problem it attempts to solve, may be
+    rejected immediately.
+
+ 2. **Each pull request must be manageable in size**. 
+    Self-contained pull requests that are manageable in size may target `main` directly. 
+    Larger contributions though must be structured as a series of smaller pull requests 
+    each building upon the previous one, all ideally tracked in a tracking issue 
+    (i.e., [an EPIC](#project-board)). 
+    These pull requests must target a long-lived feature branch. 
+    For details, see the [development procedure guidelines](#development-procedure).
+    Poorly structured pull requests may be rejected immediately with a
+    request to restructure them.
+
+    **Note**: This does not necessarily apply to documentation-related changes or
+    automatically generated code (e.g. generated from Protobuf definitions). But
+    automatically generated code changes should occur within separate commits, so
+    they are easily distinguishable from manual code changes.
+
+### Workflow
+
+To ensure a smooth workflow for all contributors, a general procedure for contributing has been established.
+
+1. Start by browsing [existing issues](https://github.com/cosmos/gaia/issues) and [discussions](https://github.com/cosmos/gaia/discussions). If you are looking for something interesting or if you have something in your mind, there is a chance it had been discussed.
+   * Looking for a good place to start contributing? How about checking out some [good first issues](https://github.com/cosmos/gaia/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) or [bugs](https://github.com/cosmos/gaia/issues?q=is%3Aopen+is%3Aissue+label%3Abug)?
+2. Determine whether a GitHub issue or discussion is more appropriate for your needs:
+   1. If you want to propose something new that requires specification or an additional design, or you would like to change a process, start with a [new discussion](https://github.com/cosmos/gaia/discussions/new/choose). With discussions, we can better handle the design process using discussion threads. A discussion usually leads to one or more issues.
+   2. If the issue you want addressed is a specific proposal or a bug, then open a [new issue](https://github.com/cosmos/gaia/issues/new/choose).
+   3. Review existing [issues](https://github.com/cosmos/gaia/issues) to find an issue you'd like to help with.
+3. Participate in thoughtful discussion on that issue.
+4. If you would like to contribute:
+   1. Ensure that the proposal has been accepted.
+   2. Ensure that nobody else has already begun working on this issue. If they have,
+      make sure to contact them to collaborate.
+   3. If nobody has been assigned for the issue and you would like to work on it,
       make a comment on the issue to inform the community of your intentions
-      to begin work
-   4. Follow standard Github best practices: fork the repo, branch from the
-      HEAD of `master`, make some commits, and submit a PR to `master`
-      - For core developers working within the cosmos-sdk repo, to ensure a clear
-      ownership of branches, branches must be named with the convention
-      `{moniker}/{issue#}-branch-name`
-   5. Be sure to submit the PR in `Draft` mode submit your PR early, even if
-      it's incomplete as this indicates to the community you're working on
-      something and allows them to provide comments early in the development process
-   6. When the code is complete it can be marked `Ready for Review`
-   7. Be sure to include a relevant change log entry in the `Unreleased` section
-      of `CHANGELOG.md` (see file for log format)
+      to begin work and please wait for an acknowledgement from the stewarding team.
+5. To submit your work as a contribution to the repository, follow standard GitHub best practices. 
+   See [development procedure guidelines](#development-procedure) below.
 
-Note that for very small or blatantly obvious problems (such as typos) it is
-not required to an open issue to submit a PR, but be aware that for more complex
-problems/features, if a PR is opened before an adequate design discussion has
-taken place in a github issue, that PR runs a high likelihood of being rejected.
+**Note:** For very small or trivial issues such as typos, you are not required to open an issue before submitting a PR. 
+For complex problems or features, please make sure to open an issue and provide context and problem description. 
+PRs opened before adequate design discussion has taken place in a GitHub issue have a high likelihood of being rejected without review.
 
-Take a peek at our [coding repo](https://github.com/tendermint/coding) for
-overall information on repository workflow and standards. Note, we use `make
-tools` for installing the linting tools.
+## Project Board
 
-Other notes:
-  - Looking for a good place to start contributing? How about checking out some
-    [good first issues](https://github.com/cosmos/gaia/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
-  - Please make sure to use `gofmt` before every commit - the easiest way to do
-    this is have your editor run it for you upon saving a file. Additionally
-    please ensure that your code is lint compliant by running `make lint`
+We use self-organizing principles to coordinate and collaborate across organizations in structured "EPICs" that focus on specific problem domains or architectural components of Gaia. For details, see the [GitHub Project board](https://github.com/orgs/cosmos/projects/28/views/11). 
 
-## Pull Requests
+The developers work in sprints, which are available in a [GitHub Project](https://github.com/orgs/cosmos/projects/28/views/2). 
 
-To accommodate review process we suggest that PRs are categorically broken up.
-Ideally each PR addresses only a single issue. Additionally, as much as possible
-code refactoring and cleanup should be submitted as a separate PRs from bugfixes/feature-additions.
+## Architecture Decision Records (ADR)
 
-### Process for reviewing PRs
+When proposing an architecture decision for Gaia, please start by opening an [issue](https://github.com/cosmos/gaia/issues/new/choose) or a [discussion](https://github.com/cosmos/gaia/discussions/new) with a summary of the proposal. Once the proposal has been discussed and there is rough alignment on a high-level approach to the design, you may either start development, or write an ADR.
 
-All PRs require two Reviews before merge (except docs changes, or variable name-changes which only require one). When reviewing PRs please use the following review explanations:
+If your architecture decision is a simple change, you may contribute directly without writing an ADR. However, if you are proposing a significant change, please include a corresponding ADR.
 
-- `LGTM` without an explicit approval means that the changes look good, but you haven't pulled down the code, run tests locally and thoroughly reviewed it.
-- `Approval` through the GH UI means that you understand the code, documentation/spec is updated in the right places, you have pulled down and tested the code locally. In addition:
-  - You must also think through anything which ought to be included but is not
-  - You must think through whether any added code could be partially combined (DRYed) with existing code
-  - You must think through any potential security issues or incentive-compatibility flaws introduced by the changes
-  - Naming must be consistent with conventions and the rest of the codebase
-  - Code must live in a reasonable location, considering dependency structures (e.g. not importing testing modules in production code, or including example code modules in production code).
-  - if you approve of the PR, you are responsible for fixing any of the issues mentioned here and more
-- If you sat down with the PR submitter and did a pairing review please note that in the `Approval`, or your PR comments.
-- If you are only making "surface level" reviews, submit any notes as `Comments` without adding a review.
+To create an ADR, follow the [template](./docs/architecture/adr-template.md) and [doc](./docs/architecture/README.md). If you would like to see examples of how these are written, please refer to the current [ADRs](https://github.com/cosmos/gaia/tree/main/docs/architecture).
 
-### Updating Documentation
+## Development Procedure
 
-If you open a PR in Gaia, it is mandatory to update the relevant documentation in /docs.
+`main` must be stable, include only completed features and never fail `make lint`, `make run-tests`, or `make build/install`.
 
-* If your changes relate specifically to the gaia application, please modify the docs/ folder.
+Depending on the scope of the work, we differentiate between self-contained pull requests and long-lived contributions (features).
 
-## Forking
+**Self-contained pull requests**:
 
-Please note that Go requires code to live under absolute paths, which complicates forking.
-While my fork lives at `https://github.com/rigeyrigerige/gaia`,
-the code should never exist at  `$GOPATH/src/github.com/rigeyrigerige/gaia`.
-Instead, we use `git remote` to add the fork as a new remote for the original repo,
-`$GOPATH/src/github.com/cosmos/gaia `, and do all the work there.
+* Fork the repo (core developers must create a branch directly in the Gaia repo),
+branch from the HEAD of `main`, make some commits, and submit a PR to `main`.
+* For developers who are core contributors and are working within the `gaia` repo, follow branch name conventions to ensure clear
+ownership of branches: `{moniker}/{issue#}-branch-name`.
+* See [Branching Model](#branching-model-and-release) for more details.
 
-For instance, to create a fork and work on a branch of it, I would:
+**Large contributions**:
 
-  - Create the fork on github, using the fork button.
-  - Go to the original repo checked out locally (i.e. `$GOPATH/src/github.com/cosmos/gaia`)
-  - `git remote rename origin upstream`
-  - `git remote add origin git@github.com:rigeyrigerige/gaia.git`
+* Make sure that a feature branch is created in the repo.
+  This will be created by the stewarding team after design discussions. 
+  The name convention for the feature branch must be `feat/{issue#}-branch-name`.
+  Note that (similar to `main`) all feature branches have branch protection rules and they run the CI.
+  Unlike `main`, feature branch may intermittently fail `make lint`, `make run-tests`, or `make build/install`.
+* Fork the repo (core developers must create a branch directly in the Gaia repo),
+  branch from the HEAD of the feature branch, make some commits, and submit a PR to the feature branch.
+  All PRs targeting a feature branch should follow the same guidelines in this document.
+* Once the feature is completed, submit a PR from the feature branch targeting `main`. 
+  
+Be sure to run `make format` before every commit. The easiest way
+to do this is have your editor run it for you upon saving a file (most of the editors
+will do it anyway using a pre-configured setup of the programming language mode).
+A convenience git `pre-commit` hook that runs the formatters automatically
+before each commit is available in the `contrib/githooks/` directory.
 
-Now `origin` refers to my fork and `upstream` refers to the Gaia version.
-So I can `git push -u origin master` to update my fork, and make pull requests to Gaia from there.
-Of course, replace `rigeyrigerige` with your git handle.
+**Note:** Exceptions to the above guidelines are possible, but only after prior discussions with the stewarding team. 
 
-To pull in updates from the origin repo, run
+### Testing
 
-  - `git fetch upstream`
-  - `git rebase upstream/master` (or whatever branch you want)
+Tests can be executed by running `make run-tests` at the top level of the Gaia repository.
+For running the e2e tests, make sure to build the docker images by running `make docker-build-all`.
 
-Please don't make Pull Requests to `master`.
-
-## Dependencies
-
-We use [Go 1.11 Modules](https://github.com/golang/go/wiki/Modules) to manage
-dependency versions.
-
-The master branch of every Cosmos repository should just build with `go get`,
-which means they should be kept up-to-date with their dependencies so we can
-get away with telling people they can just `go get` our software.
-
-Since some dependencies are not under our control, a third party may break our
-build, in which case we can fall back on `go mod tidy -v`.
-
-## Testing
-
-All repos should be hooked up to [CircleCI](https://circleci.com/).
-
-If they have `.go` files in the root directory, they will be automatically
-tested by circle using `go test -v -race ./...`. If not, they will need a
-`circle.yml`. Ideally, every repo has a `Makefile` that defines `make test` and
-includes its continuous integration status using a badge in the `README.md`.
-
-We expect tests to use `require` or `assert` rather than `t.Skip` or `t.Fail`,
-unless there is a reason to do otherwise.
 When testing a function under a variety of different inputs, we prefer to use
 [table driven tests](https://github.com/golang/go/wiki/TableDrivenTests).
 Table driven test error messages should follow the following format
@@ -149,72 +161,166 @@ Here is an example check:
 ```go
 <some table>
 for tcIndex, tc := range cases {
-  <some code>
-  for i := 0; i < tc.numTxsToTest; i++ {
-      <some code>
-			require.Equal(t, expectedTx[:32], calculatedTx[:32],
-				"First 32 bytes of the txs differed. tc #%d, i #%d", tcIndex, i)
+<some code>
+for i := 0; i < tc.numTxsToTest; i++ {
+<some code>
+require.Equal(t, expectedTx[:32], calculatedTx[:32],
+"First 32 bytes of the txs differed. tc #%d, i #%d", tcIndex, i)
 ```
+
+### Pull Requests
+
+Before submitting a pull request:
+
+* synchronize your branch with the latest base branch (i.e., `main` or feature branch) and resolve any arising conflicts, e.g.,
+  - either `git fetch origin/main && git merge origin/main`
+  - or `git fetch origin/main && git rebase -i origin/main`
+* run `make lint`, `make run-tests`, `make build/install` to ensure that all checks and tests pass.
+
+Then:
+
+1. If you have something to show, **start with a `Draft` PR**. It's good to have early validation of your work and we highly recommend this practice. A Draft PR also indicates to the community that the work is in progress.
+   Draft PRs also help the stewarding team provide early feedback and ensure the work is in the right direction.
+2. When the code is complete, change your PR from `Draft` to `Ready for Review`.
+3. Go through the actions for each checkbox present in the PR template description. The PR actions are automatically provided for each new PR.
+
+PRs must have a category prefix that is based on the type of changes being made (for example, `fix`, `feat`,
+`refactor`, `docs`, and so on). The [type](https://github.com/commitizen/conventional-commit-types/blob/v3.0.0/index.json) 
+must be included in the PR title as a prefix (for example, `fix: <description>`). 
+This convention ensures that all changes that are committed to the base branch follow the
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
+Additionally, **each PR should only address a single issue**.
+
+Pull requests are merged automatically using [`A:automerge` action](https://mergify.io/features/auto-merge).
+
+**Note:** When merging, GitHub will squash commits and rebase on top of the base branch.
+
+### Pull Request Templates
+
+There are three PR templates. The [default template](./.github/PULL_REQUEST_TEMPLATE.md) contains links to the three templates. Please go the the `Preview` tab and select the appropriate sub-template:
+
+- The [production template](./.github/PULL_REQUEST_TEMPLATE/production.md) is for types `fix`, `feat`, `deps`, and `refactor`. 
+- The [docs template](./.github/PULL_REQUEST_TEMPLATE/docs.md) is for documentation changes.
+- The [other template](./.github/PULL_REQUEST_TEMPLATE/other.md) is for changes that do not affect production code. 
+
+### Requesting Reviews
+
+In order to accommodate the review process, the author of the PR must complete the author checklist
+(from the pull request template)
+to the best of their abilities before marking the PR as "Ready for Review". If you would like to
+receive early feedback on the PR, open the PR as a "Draft" and leave a comment in the PR indicating
+that you would like early feedback and tagging whoever you would like to receive feedback from.
+
+Codeowners are marked automatically as the reviewers.
+
+All PRs require at least two review approvals before they can be merged (one review might be acceptable in
+the case of minor changes to [docs](./.github/PULL_REQUEST_TEMPLATE/docs.md) or [other](./.github/PULL_REQUEST_TEMPLATE/other.md) changes that do not affect production code). Each PR template has a reviewers checklist that must be completed before the PR can be merged. Each reviewer is responsible
+for all checked items unless they have indicated otherwise by leaving their handle next to specific
+items. In addition, use the following review explanations:
+
+* `LGTM` without an explicit approval means that the changes look good, but you haven't thoroughly reviewed the reviewer checklist items.
+* `Approval` means that you have completed some or all of the reviewer checklist items. If you only reviewed selected items, you must add your handle next to the items that you have reviewed. In addition, follow these guidelines:
+    * You must also think through anything which ought to be included but is not
+    * You must think through whether any added code could be partially combined (DRYed) with existing code
+    * You must think through any potential security issues or incentive-compatibility flaws introduced by the changes
+    * Naming must be consistent with conventions and the rest of the codebase
+    * Code must live in a reasonable location, considering dependency structures (for example, not importing testing modules in production code, or including example code modules in production code).
+    * If you approve the PR, you are responsible for any issues mentioned here and any issues that should have been addressed after thoroughly reviewing the reviewer checklist items in the pull request template.
+* If you sat down with the PR submitter and did a pairing review, add this information in the `Approval` or your PR comments.
+* If you are only making "surface level" reviews, submit notes as a `comment` review.
+
+### Updating Documentation
+
+If you open a PR in Gaia, it is mandatory to update the relevant documentation in `/docs`.
+
+### Changelog
+
+To manage and generate our changelog, we currently use [unclog](https://github.com/informalsystems/unclog).
+
+Every PR with types `fix`, `feat`, `deps`, and `refactor` should include a file 
+`.changelog/unreleased/${section}/[${component}/]${pr-number}-${short-description}.md`,
+where:
+
+- `section` is one of 
+  `dependencies`, `improvements`, `features`, `bug-fixes`, `state-breaking`, `api-breaking`, 
+  and _**if multiple apply, create multiple files**_;
+- `pr-number` is the PR number;
+- `short-description` is a short (4 to 6 word), hyphen separated description of the change;
+- `component` is used for changes that affect one of the components defined in the [config](.changelog/config.toml), e.g., `tests`, `globalfee`.
+
+For examples, see the [.changelog](.changelog) folder.
+
+Use `unclog` to add a changelog entry in `.changelog` (check the [requirements](https://github.com/informalsystems/unclog#requirements) first): 
+```bash
+# add a general entry
+unclog add 
+   -i "${pr-number}-${short-description}" 
+   -p "${pr-number}" 
+   -s "${section}" 
+   -m "${description}"
+
+# add a entry to a component 
+unclog add 
+   -i "${pr-number}-${short-description}" 
+   -p "${pr-number}" 
+   -c "${component}"
+   -s "${section}" 
+   -m "${description}"
+```
+where `${description}` is a detailed description of the changelog entry.
+
+For example, 
+```bash
+# add an entry for bumping IBC to v4.4.2
+unclog add -i "2554-bump-ibc" -p 2554 -s "dependencies" -m "Bump [ibc-go](https://github.com/cosmos/ibc-go) to [v4.4.2](https://github.com/cosmos/ibc-go/releases/tag/v4.4.2)" 
+
+# add an entry for changing the global fee module;
+# note that the entry is added to both state-breaking and api-breaking sections
+unclog add -i "2424-params" -p 2424 -c globalfee -s "state-breaking" -m "Add \`bypass-min-fee-msg-types\` and \`maxTotalBypassMinFeeMsgGagUsage\` to globalfee params" 
+unclog add -i "2424-params" -p 2424 -c globalfee -s "api-breaking" -m "Add \`bypass-min-fee-msg-types\` and \`maxTotalBypassMinFeeMsgGagUsage\` to globalfee params" 
+```
+
+**Note:** Changelog entries should answer the question: "what is important about this
+change for users to know?" or "what problem does this solve for users?". It
+should not simply be a reiteration of the title of the associated PR, unless the
+title of the PR _very_ clearly explains the benefit of a change to a user.
+
+## Dependencies
+
+We use [Go Modules](https://github.com/golang/go/wiki/Modules) to manage
+dependency versions.
+
+The main branch of every Cosmos repository should just build with `go get`,
+which means they should be kept up-to-date with their dependencies so we can
+get away with telling people they can just `go get` our software.
+
+When dependencies in Gaia's `go.mod` are changed, it is generally accepted practice
+to delete `go.sum` and then run `go mod tidy`.
+
+Since some dependencies are not under our control, a third party may break our
+build, in which case we can fall back on `go mod tidy -v`.
+
+## Protobuf
+
+We use [Protocol Buffers](https://developers.google.com/protocol-buffers) along with [gogoproto](https://github.com/cosmos/gogoproto) to generate code for use in Gaia.
+
+For deterministic behavior around Protobuf tooling, everything is containerized using Docker. Make sure to have Docker installed on your machine, or head to [Docker's website](https://docs.docker.com/get-docker/) to install it.
+
+To generate the protobuf stubs, you can run `make proto-gen`.
 
 ## Branching Model and Release
 
-User-facing repos should adhere to the trunk based development branching model: https://trunkbaseddevelopment.com/.
+User-facing repos should adhere to the trunk based development branching model: https://trunkbaseddevelopment.com. User branches should start with a user name, example: `{moniker}/{issue#}-branch-name`.
 
-Libraries need not follow the model strictly, but would be wise to.
-
-Gaia utilizes [semantic versioning](https://semver.org/).
+Gaia follows [semantic versioning](https://semver.org), but with the some deviations to account for state-machine and API breaking changes. See [RELEASE_PROCESS.md](./RELEASE_PROCESS.md) for details. 
 
 ### PR Targeting
 
-Ensure that you base and target your PR on the `master` branch.
+Ensure that you base and target your PRs on either `main` or a feature branch.
 
-All feature additions should be targeted against `master`. Bug fixes for an outstanding release candidate
-should be targeted against the release candidate branch. Release candidate branches themselves should be the
-only pull requests targeted directly against master.
+All complete features and bug fixes must be targeted against `main`. 
+Exception is for bug fixes which are only related to a released version. 
+In that case, the related bug fix PRs must target against the release branch.
 
-### Development Procedure
-  - the latest state of development is on `master`
-  - `master` must never fail `make test` or `make test_cli`
-  - `master` should not fail `make lint`
-  - no `--force` onto `master` (except when reverting a broken commit, which should seldom happen)
-  - create a development branch either on github.com/cosmos/gaia, or your fork (using `git remote add origin`)
-  - before submitting a pull request, begin `git rebase` on top of `master`
+If needed, we will backport a commit from `main` to a release branch with appropriate consideration of versioning.
 
-### Pull Merge Procedure
-  - ensure pull branch is rebased on `master`
-  - run `make test` and `make test_cli` to ensure that all tests pass
-  - merge pull request
-
-### Release Procedure
-
-- Start on `master`
-- Create the release candidate branch `rc/v*` (going forward known as **RC**)
-  and ensure it's protected against pushing from anyone except the release
-  manager/coordinator
-  - **no PRs targeting this branch should be merged unless exceptional circumstances arise**
-- On the `RC` branch, prepare a new version section in the `CHANGELOG.md` and
-  kick off a large round of simulation testing (e.g. 400 seeds for 2k blocks)
-- If errors are found during the simulation testing, commit the fixes to `master`
-  and create a new `RC` branch (making sure to increment the `rcN`)
-- After simulation has successfully completed, create the release branch
-  (`release/vX.XX.X`) from the `RC` branch
-- Merge the release branch to `master` to incorporate the `CHANGELOG.md` updates
-- Delete the `RC` branches
-
-### Point Release Procedure
-
-At the moment, only a single major release will be supported, so all point
-releases will be based off of that release.
-
-  - start on `vX.XX.X`
-  - checkout a new branch `pre-rc/vX.X.X`
-  - cherry pick the desired changes from `master`
-    - these changes should be small and NON-BREAKING (both API and state machine)
-  - add entries to CHANGELOG.md and remove corresponding pending log entries
-  - checkout a new branch `rc/vX.X.X` based off of `vX.XX.X`
-  - create a PR merging `pre-rc/vX.X.X` into `rc/vX.X.X`
-  - run tests and simulations (noted in [Release Procedure](#release-procedure))
-  - after tests and simulation have successfully completed, create the release branch `release/vX.XX.X` from the `RC` branch
-  - delete the `pre-rc/vX.X.X` and `RC` branches
-  - create a PR into `master` containing ONLY the CHANGELOG.md updates
-  - tag and release `release/vX.XX.X`

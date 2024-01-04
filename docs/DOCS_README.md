@@ -1,35 +1,40 @@
+<!--
+parent:
+  order: false
+-->
+
 # Updating the docs
 
-If you want to open a PR on Gaia to update the documentation, please follow the guidelines in the [`CONTRIBUTING.md`](https://github.com/cosmos/gaia/tree/master/CONTRIBUTING.md)
+If you want to open a PR on Gaia to update the documentation, please follow the guidelines in the [`CONTRIBUTING.md`](https://github.com/cosmos/gaia/tree/main/CONTRIBUTING.md)
+
+## Internationalization
+
+- Translations for documentation live in a `docs/<locale>/` folder, where `<locale>` is the language code for a specific language. For example, `zh` for Chinese, `ko` for Korean, `es` for Spanish, etc.
+- Each `docs/<locale>/` folder must follow the same folder structure within `docs/`, but only content in the following folders needs to be translated and included in the respective `docs/<locale>/` folder
+- Each `docs/<locale>/` folder must also have a `README.md` that includes a translated version of both the layout and content within the root-level [`README.md`](https://github.com/cosmos/cosmos-sdk/tree/master/docs/README.md). The layout defined in the `README.md` is used to build the homepage.
+- For additional configuration options, please see [VuePress Internationalization](https://vuepress.vuejs.org/guide/i18n.html).
 
 ## Docs Build Workflow
 
 The documentation for Gaia is hosted at:
 
-- https://hub.cosmos.network/docs/ 
+- <https://hub.cosmos.network/>
 
-built from the files in this (`/docs`) directory for [master](https://github.com/cosmos/gaia/tree/master/docs)
-
+built from the files in this (`/docs`) directory for [main](https://github.com/cosmos/gaia/tree/main/docs).
 
 ### How It Works
 
-There is a CircleCI job listening for changes in the `/docs` directory, on both
-the  `master` and `develop` branches. Any updates to files in this directory
-on those branches will automatically trigger a website deployment. Under the hood,
-the private website repository has a `make build-docs` target consumed by a CircleCI job in that repo.
+There is a [Github Action](https://github.com/cosmos/gaia/blob/main/.github/workflows/docs.yml)
+listening for changes in the `/docs` directory, on the `main` branch.
+Any updates to files in this directory on that branch will automatically
+trigger a website deployment. Under the hood, `make build-docs` is run from the
+[Makefile](https://github.com/cosmos/gaia/blob/main/Makefile) in this repo.
 
 ## README
 
 The [README.md](./README.md) is also the landing page for the documentation
 on the website. During the Jenkins build, the current commit is added to the bottom
 of the README.
-
-## Config.js
-
-The [config.js](./.vuepress/config.js) generates the sidebar and Table of Contents
-on the website docs. Note the use of relative links and the omission of
-file extensions. Additional features are available to improve the look
-of the sidebar.
 
 ## Links
 
@@ -61,63 +66,48 @@ to send users to the GitHub.
 
 ## Building Locally
 
-To build and serve the documentation locally, run:
+To build and serve the documentation locally, make sure you're in the `docs` directory and run the following:
+
+Clear `node_modules` for a clean install. This is not necessary every time.
 
 ```bash
-npm install -g vuepress
+rm -rf node_modules
 ```
 
-then change the following line in the `config.js`:
-
-```js
-base: "/docs/",
-```
-
-to:
-
-```js
-base: "/",
-```
-
-Finally, go up one directory to the root of the repo and run:
+Install project dependencies
 
 ```bash
-# from root of repo
-vuepress build docs
-cd dist/docs
-python -m SimpleHTTPServer 8080
+npm install
 ```
 
-then navigate to localhost:8080 in your browser.
+Serve the app
 
-## Build RPC Docs
+```bash
+npm run serve
+```
 
-First, run `make tools` from the root of repo, to install the swagger-ui tool.
+then navigate to `localhost:8080` in your browser.
 
-Then, edit the `swagger.yaml` manually; it is found [here](https://github.com/cosmos/gaia/blob/master/cmd/gaiacli/swagger-ui/swagger.yaml)
-
-Finally, run `make update-gaia-lite-docs` from the root of the repo.
+To build documentation as a static website run `npm run build`. You will find the website in `.vuepress/dist` directory.
 
 ## Search
 
 We are using [Algolia](https://www.algolia.com) to power full-text search. This uses a public API search-only key in the `config.js` as well as a [cosmos_network.json](https://github.com/algolia/docsearch-configs/blob/master/configs/cosmos_network.json) configuration file that we can update with PRs.
 
-## Consistency
-
-Because the build processes are identical (as is the information contained herein), this file should be kept in sync as
-much as possible with its [counterpart in the Tendermint Core repo](https://github.com/tendermint/tendermint/blob/develop/docs/DOCS_README.md).
-
 ### Update and Build the RPC docs
 
 1. Execute the following command at the root directory to install the swagger-ui generate tool.
-    ```bash
-    make tools
-    ```
+
+   ```bash
+   make tools
+   ```
+
 2. Edit API docs
-    1. Directly Edit API docs manually: `cmd/gaiacli/swagger-ui/swagger.yaml`.
-    2. Edit API docs within the [Swagger Editor](https://editor.swagger.io/). Please refer to this [document](https://swagger.io/docs/specification/2-0/basic-structure/) for the correct structure in `.yaml`.
-3. Download `swagger.yaml` and replace the old `swagger.yaml` under fold `cmd/gaiacli/swagger-ui`.
-4. Compile gaiacli
-    ```bash
-    make install
-    ```
+   1. Directly Edit API docs manually: `cmd/gaiad/swagger-ui/swagger.yaml`.
+   2. Edit API docs within the [Swagger Editor](https://editor.swagger.io/). Please refer to this [document](https://swagger.io/docs/specification/2-0/basic-structure/) for the correct structure in `.yaml`.
+3. Download `swagger.yaml` and replace the old `swagger.yaml` under fold `cmd/gaiad/swagger-ui`.
+4. Compile gaiad
+
+   ```bash
+   make install
+   ```

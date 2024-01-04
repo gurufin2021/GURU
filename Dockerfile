@@ -1,33 +1,20 @@
-# Simple usage with a mounted data directory:
-# > docker build -t gaia .
-# > docker run -it -p 46657:46657 -p 46656:46656 -v ~/.gaiad:/root/.gaiad -v ~/.gaiacli:/root/.gaiacli gaia gaiad init
-# > docker run -it -p 46657:46657 -p 46656:46656 -v ~/.gaiad:/root/.gaiad -v ~/.gaiacli:/root/.gaiacli gaia gaiad start
-FROM golang:alpine AS build-env
+ARG IMG_TAG=latest
 
-# Set up dependencies
-ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3
-
-# Set working directory for the build
-WORKDIR /go/src/github.com/cosmos/gaia
-
-# Add source files
+# Compile the gaiad binary
+FROM golang:1.20-alpine AS gaiad-builder
+WORKDIR /src/app/
+COPY go.mod go.sum* ./
+RUN go mod download
 COPY . .
+ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3
+RUN apk add --no-cache $PACKAGES
+RUN CGO_ENABLED=0 make install
 
-# Install minimum necessary dependencies, build Cosmos SDK, remove packages
-RUN apk add --no-cache $PACKAGES && \
-    make tools && \
-    make install
+# Add to a distroless container
+FROM cgr.dev/chainguard/static:$IMG_TAG
+ARG IMG_TAG
+COPY --from=gaiad-builder /go/bin/gaiad /usr/local/bin/
+EXPOSE 26656 26657 1317 9090
+USER 0
 
-# Final image
-FROM alpine:edge
-
-# Install ca-certificates
-RUN apk add --update ca-certificates
-WORKDIR /root
-
-# Copy over binaries from the build-env
-COPY --from=build-env /go/bin/gaiad /usr/bin/gaiad
-COPY --from=build-env /go/bin/gaiacli /usr/bin/gaiacli
-
-# Run gaiad by default, omit entrypoint to ease using container with gaiacli
-CMD ["gaiad"]
+ENTRYPOINT ["gaiad", "start"]

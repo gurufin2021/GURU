@@ -1,4 +1,9 @@
-## Validator Security
+---
+order: 4
+title: Validator Security
+---
+
+# Validator Security
 
 Each validator candidate is encouraged to run its operations independently, as diverse setups increase the resilience of the network. Validator candidates should commence their setup phase now in order to be on time for launch.
 
@@ -6,9 +11,9 @@ Each validator candidate is encouraged to run its operations independently, as d
 
 It is mission critical that an attacker cannot steal a validator's key. If this is possible, it puts the entire stake delegated to the compromised validator at risk. Hardware security modules are an important strategy for mitigating this risk.
 
-HSM modules must support `ed25519` signatures for the hub. The YubiHSM2 supports `ed25519` and we expect to have an adapter library available in December 2017. The YubiHSM can protect a private key but cannot ensure in a secure setting that it won't sign the same block twice.
+HSM modules must support `ed25519` signatures for the hub. The YubiHSM2 supports `ed25519` and [this yubikey library is available](https://github.com/iqlusioninc/yubihsm.rs). The YubiHSM can protect a private key but cannot ensure in a secure setting that it won't sign the same block twice.
 
-The Tendermint team is also working on extending our Ledger Nano S application to support validator signing. This app can store recent blocks and mitigate double signing attacks.
+The CometBFT team is also working on extending our Ledger Nano S application to support validator signing. This app can store recent blocks and mitigate double signing attacks.
 
 We will update this page when more key storage solutions become available.
 
@@ -49,7 +54,7 @@ private_peer_ids = "node_ids_of_private_peers"
 By default, uppercase environment variables with the following prefixes will replace lowercase command-line flags:
 
 - `GA` (for Gaia flags)
-- `TM` (for Tendermint flags)
+- `TM` (for Tendermint/CometBFT flags)
 - `BC` (for democli or basecli flags)
 
 For example, the environment variable `GA_CHAIN_ID` will map to the command line flag `--chain-id`. Note that while explicit command-line flags will take precedence over environment variables, environment variables will take precedence over any of your configuration files. For this reason, it's imperative that you lock down your environment such that any critical parameters are defined as flags on the CLI or prevent modification of any environment variables.

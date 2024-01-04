@@ -1,55 +1,45 @@
-package app
+package gaia_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/tendermint/tm-db"
+	db "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/simapp"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	gaia "github.com/cosmos/gaia/v14/app"
+	gaiahelpers "github.com/cosmos/gaia/v14/app/helpers"
 )
 
-func TestGaiadExport(t *testing.T) {
-	db := db.NewMemDB()
-	gapp := NewGaiaApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
-	setGenesis(gapp)
+type EmptyAppOptions struct{}
 
-	// Making a new app object with the db, so that initchain hasn't been called
-	newGapp := NewGaiaApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
-	_, _, err := newGapp.ExportAppStateAndValidators(false, []string{})
-	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
-}
-
-// ensure that black listed addresses are properly set in bank keeper
-func TestBlackListedAddrs(t *testing.T) {
-	db := db.NewMemDB()
-	app := NewGaiaApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
-
-	for acc := range maccPerms {
-		require.True(t, app.bankKeeper.BlacklistedAddr(app.supplyKeeper.GetModuleAddress(acc)))
-	}
-}
-
-func setGenesis(gapp *GaiaApp) error {
-
-	genesisState := simapp.NewDefaultGenesisState()
-	stateBytes, err := codec.MarshalJSONIndent(gapp.cdc, genesisState)
-	if err != nil {
-		return err
-	}
-
-	// Initialize the chain
-	gapp.InitChain(
-		abci.RequestInitChain{
-			Validators:    []abci.ValidatorUpdate{},
-			AppStateBytes: stateBytes,
-		},
-	)
-	gapp.Commit()
+func (ao EmptyAppOptions) Get(_ string) interface{} {
 	return nil
+}
+
+func TestGaiaApp_BlockedModuleAccountAddrs(t *testing.T) {
+	app := gaia.NewGaiaApp(
+		log.NewNopLogger(),
+		db.NewMemDB(),
+		nil,
+		true,
+		map[int64]bool{},
+		gaia.DefaultNodeHome,
+		0,
+		gaia.MakeTestEncodingConfig(),
+		EmptyAppOptions{},
+	)
+	moduleAccountAddresses := app.ModuleAccountAddrs()
+	blockedAddrs := app.BlockedModuleAccountAddrs(moduleAccountAddresses)
+
+	require.NotContains(t, blockedAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+}
+
+func TestGaiaApp_Export(t *testing.T) {
+	app := gaiahelpers.Setup(t)
+	_, err := app.ExportAppStateAndValidators(true, []string{})
+	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
 }
